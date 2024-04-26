@@ -30,9 +30,16 @@ APPLICATION_SECRET=
 CONSUMER_KEY=
 SERVICEID=
 
-Exemple de commande :
+Exemples de commande :
 ```
-python.exe .\csv-ovh-vm.py -f 'C:\Users\flore\OneDrive - Université Savoie Mont Blanc\Enseignements\Journée Immersion Lycéen\mars-2024.csv' --key 82c9614cbf98a9ae --secret dde64253988ad0d6d335f261bce84843 --cons 3a8b74c7c98ea651798c0be578ded153 -a create --service 81d63e9494aa4029866afdc3d5623c3d --ssh ovh-student
+#Creating vm from csv
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --key YYYYY --secret XXXXXX --cons WWWWW -a create --service ZZZZZ --ssh ovh-student
+
+#Getting ip address and filling csv
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --key YYYYY --secret XXXXXX --cons WWWWW -a get_ip --service ZZZZZ --ssh ovh-student
+
+#Delete vm
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --key YYYYY --secret XXXXXX --cons WWWWW -a delete --service ZZZZZ --ssh ovh-student
 ```
 
 Check constant : DISABLE_INSTANCE_CREATION = False
