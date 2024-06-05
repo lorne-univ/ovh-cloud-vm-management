@@ -49,7 +49,12 @@ def remove_accent(chaine: str) -> str:
 
 
 def create_instance(
-    name: str, flavorId: str, imageId: str, region: str, sshKeyId: str
+    name: str,
+    flavorId: str,
+    imageId: str,
+    region: str,
+    sshKeyId: str,
+    monthlyBilling: bool,
 ) -> str:
     """
     Parameters:
@@ -67,6 +72,11 @@ def create_instance(
     client = get_client()
     logging.debug("Create instance {} {} {} {}".format(name, region, flavorId, imageId))
     # For testing it's possible to Disable Instance Creation
+    if monthlyBilling:
+        monthlyBilling = True
+    else:
+        monthlyBilling = False
+
     if not DISABLE_INSTANCE_CREATION:
         instance_infos = client.post(
             f"/cloud/project/{settings['serviceId']}/instance",
@@ -74,6 +84,7 @@ def create_instance(
             flavorId=flavorId,
             imageId=imageId,
             region=region,
+            monthlyBilling=monthlyBilling,
             sshKeyId=sshKeyId,
         )
         instance_infos = json.dumps(instance_infos, indent=4)
@@ -311,7 +322,7 @@ def get_param_id(param_name: str, param: str, region: str) -> str:
     print(f"Can't find {param_name} ID for {param} and region {region} ")
 
 
-def create_instances_from_csv(fileName, sshKeyId):
+def create_instances_from_csv(fileName, sshKeyId, monthlyBilling):
     """
     Create an instance for each users in the csv file.
     instance name will be the user firstname (Prénom) prefixed by pc-
@@ -343,6 +354,7 @@ def create_instances_from_csv(fileName, sshKeyId):
             imageId=get_param_id("image", row["image"], row["region"]),
             region=row["region"],
             sshKeyId=sshKeyId,
+            monthlyBilling=monthlyBilling,
         )
         logging.debug(
             "Creating instance : {} {} {}".format(
@@ -442,6 +454,13 @@ def getArgs(argv=None):
         help="The action to perfom. action=c -> create instance, action=d -> delete instance, action=ip -> get ip addresses",
     )
     parser.add_argument(
+        "--monthlyBilling",
+        dest="monthlyBilling",
+        default=False,
+        choices=["true", "True"],
+        help="If we pay for a month",
+    )
+    parser.add_argument(
         "--service",
         dest="serviceId",
         help="ServiceId the cloud ovh project number.",
@@ -533,11 +552,16 @@ if __name__ == "__main__":
     if not check_serviceId():
         sys.exit(2)
 
+    if args.get("monthlyBilling") == "true" or args.get("monthlyBilling") == "True":
+        monthlyBilling = True
+    else:
+        monthlyBilling = False
+
     if args["action"] == "create":
         print("create")
         print(f"")
         sshKeyId = get_ssh_key_id(sshkey_name=args["ssh_key"])
-        create_instances_from_csv(args["fileName"], sshKeyId)
+        create_instances_from_csv(args["fileName"], sshKeyId, monthlyBilling)
     elif args["action"] == "delete":
         delete_instance_from_csv(args["fileName"])
     elif args["action"] == "get_ip":
