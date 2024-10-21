@@ -9,6 +9,7 @@ import os
 from tabulate import tabulate
 import random
 import unicodedata
+from dotenv import load_dotenv
 
 """
 For creating ovh cloud instance from a csv file.
@@ -496,33 +497,7 @@ if __name__ == "__main__":
     """
     Token creation page : https://eu.api.ovh.com/createToken/index.cgi?GET=/*&PUT=/*&POST=/*&DELETE=/*
     """
-
     args = vars(getArgs().parse_args())
-    # For prod uncoment line above and comment lines under
-
-    # args = vars(
-    #     # action : create for creating instance, get_ip
-    #     getArgs().parse_args(
-    #         [
-    #             "-f",
-    #             "C:\\Users\\flore\\OneDrive - Université Savoie Mont Blanc\\Lora\\Formations\\2024-04\\liste_candidats_lora_avril_2024.csv",
-    #             "-a",
-    #             "get_ip",
-    #             "--key",
-    #             "XXX",
-    #             "--secret",
-    #             "XXXX",
-    #             "--cons",
-    #             "XXXX",
-    #             "--service",
-    #             "XXXX",
-    #             "--ssh",
-    #             "ovh-student",
-    #             "--debug",
-    #             "debug",
-    #         ]
-    #     )
-    # )
 
     debug_value = args.get("debug", False)
     if debug_value == "debug":
@@ -536,6 +511,7 @@ if __name__ == "__main__":
     Settings can be passed with program argument or with 
     environment variable.
     """
+    load_dotenv()
     for setting in settings:
         if args[setting]:
             settings[setting] = args[setting]
