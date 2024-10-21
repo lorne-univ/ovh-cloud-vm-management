@@ -1,7 +1,8 @@
 import json
 import ovh
 from pprint import pprint
-
+from dotenv import load_dotenv
+import os
 
 """
 This module is used to list
@@ -51,22 +52,28 @@ def list_images(client, serviceName, image_name, region):
 
 
 def list_ssh_key(client, serviceName):
-    path = f"/cloud/project/{serviceName}/sshkey"
+    path = f"/cloud/project/{serviceName['id']}/sshkey"
     ssh_keys = json.loads(json.dumps(client.get(path), indent=4))
     for key in ssh_keys:
         print(f"{key['id']}  {key['name']}")
 
 
 if __name__ == "__main__":
+    load_dotenv()
+
+    application_key = os.getenv("APPLICATION_KEY")
+    application_secret = os.getenv("APPLICATION_SECRET")
+    consumer_key = os.getenv("CONSUMER_KEY")
+    service_id = os.getenv("SERVICE_ID")
     client = ovh.Client(
         endpoint="ovh-eu",  # Endpoint of API OVH Europe (List of available endpoints)
-        application_key="f5bffd0df59d3325",  # Application Key
-        application_secret="0690450d86dd6f5c7285751cc8964b0a",  # Application Secret
-        consumer_key="492f0a4ad3beb135e8beb1f25d45f644",  # Consumer Key
+        application_key=application_key,  # Application Key
+        application_secret=application_secret,  # Application Secret
+        consumer_key=consumer_key,  # Consumer Key
     )
-    serviceName = {"id": "81d63e9494aa4029866afdc3d5623c3d", "name": "Com-Lycee"}
+    serviceName = {"id": service_id, "name": "Com-Lycee"}
     # list_my_regions(client, serviceName)
     # get_infos_region(client, serviceName, "SBG5")
     # list_flavors(client, serviceName, "d2-2", "SBG5")
-    list_images(client, serviceName, "Debian", "SBG5")
-    # list_ssh_key(client, "81d63e9494aa4029866afdc3d5623c3d")
+    # list_images(client, serviceName, "Debian", "SBG5")
+    list_ssh_key(client, serviceName)
