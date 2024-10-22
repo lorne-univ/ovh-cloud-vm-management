@@ -5,30 +5,39 @@ import ovh
 from dotenv import load_dotenv
 import os
 
-
-load_dotenv()
-
-application_key = os.getenv("APPLICATION_KEY")
-application_secret = os.getenv("APPLICATION_SECRET")
-consumer_key = os.getenv("CONSUMER_KEY")
-
-# Creation Token : https://eu.api.ovh.com/createToken
-client = ovh.Client(
-    endpoint="ovh-eu",  # Endpoint of API OVH Europe (List of available endpoints)
-    application_key=application_key,  # Application Key
-    application_secret=application_secret,  # Application Secret
-    consumer_key=consumer_key,  # Consumer Key
-)
+"""
+ADD DNS RECORD IN ZONE - By default in zone 
+"""
 
 
-result = client.post(
-    "/domain/zone/usmb-tri.fr/record",
-    fieldType="A",
-    subDomain="test6",
-    target="101.101.101.4",
-)
+def add_dns_A_record(domain_zone, name, address, keys):
+    """
+    domain_zone: univ-lorawan.fr or univ-tri.fr
+    name: name of the record florent for florent.univ-tri.fr
+    address: ipv4 address for the record
+    keys: {'application_key':value, 'application_secret': value, consumer_key:'value'}
+    keys: {'application_key':value, 'application_secret': value, }
+    """
+    application_key = keys.get("application_key")
+    application_secret = keys.get("application_secret")
+    consumer_key = keys.get("consumer_key")
 
-# Pretty print
-print(json.dumps(result, indent=4))
-result = client.post("/domain/zone/usmb-tri.fr/refresh")
-print(json.dumps(result, indent=4))
+    # Creation Token : https://eu.api.ovh.com/createToken
+    client = ovh.Client(
+        endpoint="ovh-eu",  # Endpoint of API OVH Europe (List of available endpoints)
+        application_key=application_key,  # Application Key
+        application_secret=application_secret,  # Application Secret
+        consumer_key=consumer_key,  # Consumer Key
+    )
+
+    result = client.post(
+        f"/domain/zone/{domain_zone}/record",
+        fieldType="A",
+        subDomain=f"{name}",
+        target=f"{address}",
+    )
+
+    # Pretty print
+    print(json.dumps(result, indent=4))
+    result = client.post(f"/domain/zone/{domain_zone}/refresh")
+    print(json.dumps(result, indent=4))
