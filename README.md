@@ -32,14 +32,18 @@ SERVICEID=
 
 Exemples de commande :
 ```
+2 clés généralement utilisés : 
+- ovh-cloud
+- ovh-student
+
 #Creating vm from csv
-python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --monthlyBilling true --key YYYYY --secret XXXXXX --cons WWWWW -a create --service ZZZZZ --ssh ovh-student
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --monthlyBilling true --key YYYYY --secret XXXXXX --cons WWWWW -a create --service ZZZZZ --ssh ovh-cloud
 
 #Getting ip address and filling csv
-python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --monthlyBilling true --key YYYYY --secret XXXXXX --cons WWWWW -a get_ip --service ZZZZZ --ssh ovh-student
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv' --monthlyBilling true --key YYYYY --secret XXXXXX --cons WWWWW -a get_ip --service ZZZZZ --ssh ovh-cloud
 
 #Delete vm
-python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv'  --key YYYYY --secret XXXXXX --cons WWWWW -a delete --service ZZZZZ --ssh ovh-student
+python.exe .\csv-ovh-vm.py -f 'C:\Users\flo\mars-2024.csv'  --key YYYYY --secret XXXXXX --cons WWWWW -a delete --service ZZZZZ --ssh ovh-cloud
 ```
 
 Check constant : DISABLE_INSTANCE_CREATION = False

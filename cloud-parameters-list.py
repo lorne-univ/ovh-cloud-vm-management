@@ -64,7 +64,7 @@ if __name__ == "__main__":
     application_key = os.getenv("APPLICATION_KEY")
     application_secret = os.getenv("APPLICATION_SECRET")
     consumer_key = os.getenv("CONSUMER_KEY")
-    service_id = os.getenv("SERVICE_ID")
+    service_id = os.getenv("SERVICEID")
     client = ovh.Client(
         endpoint="ovh-eu",  # Endpoint of API OVH Europe (List of available endpoints)
         application_key=application_key,  # Application Key
@@ -75,5 +75,5 @@ if __name__ == "__main__":
     # list_my_regions(client, serviceName)
     # get_infos_region(client, serviceName, "SBG5")
     # list_flavors(client, serviceName, "d2-2", "SBG5")
-    # list_images(client, serviceName, "Debian", "SBG5")
-    list_ssh_key(client, serviceName)
+    list_images(client, serviceName, "Debian", "SBG5")
+    # list_ssh_key(client, serviceName)

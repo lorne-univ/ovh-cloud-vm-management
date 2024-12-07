@@ -13,11 +13,13 @@ from dotenv import load_dotenv
 
 """
 For creating ovh cloud instance from a csv file.
-The csv file exemple : 
-Nom;Prénom;region;flavor;image;Adresse IP;instanceId
+csv file exemple : 
+Nom;Prénom;region;flavor;image;Adresse IP;instanceId;hostname
 1;Florent;SBG5;d2-2;AlmaLinux 9;;
 
-settings : OVH Token or credential.
+In Excel save file as UTF8 csv
+
+settings : OVH Token or credential.exit()
 Create the different token here : https://eu.api.ovh.com/createToken/index.cgi?GET=/*&PUT=/*&POST=/*&DELETE=/*
 
 Settings can be set with program arguments or with environment variable.
@@ -37,7 +39,7 @@ settings = {
     "serviceId": None,
 }
 
-# client : ovh client use get_client() function
+# client : ovh client use get_client() function to get a client
 client = None
 # Variable to test, disable instance creation
 DISABLE_INSTANCE_CREATION = False
@@ -183,7 +185,7 @@ def read_csv(filename):
 
 
 def check_region(region):
-    logging.debug("Check region")
+    logging.info("Check region")
     regions = ["GRA", "GRA11", "RBX", "RBX-A", "SBG", "SBG5"]
     if region not in regions:
         return False, f"Your region : {region}. Available regions {regions}"
@@ -192,7 +194,7 @@ def check_region(region):
 
 
 def check_flavor(flavor):
-    logging.debug("Check flavor")
+    logging.info("Check flavor")
     client = get_client()
     path = f"/cloud/project/{settings['serviceId']}/flavor"
     flavors = json.loads(json.dumps(client.get(path), indent=4))
@@ -218,7 +220,7 @@ def check_image(image):
     """
     Check if image exists
     """
-    logging.debug("Check image")
+    logging.info("Check image")
     client = get_client()
     path = f"/cloud/project/{settings['serviceId']}/image"
     images = json.loads(json.dumps(client.get(path), indent=4))
@@ -239,6 +241,7 @@ def csv_file_validation(fileName):
     - region
     - flavor
     - image
+    - hostname
     """
     # List of all fields that must be presents
     # If the value is True, the fields must contains a value
@@ -249,6 +252,7 @@ def csv_file_validation(fileName):
         "region": {"notnull": True, "checkfunction": check_region},
         "flavor": {"notnull": True, "checkfunction": check_flavor},
         "image": {"notnull": True, "checkfunction": check_image},
+        "hostname": {"notnull": False, "checkfunction": False},
     }
     gen = read_csv(fileName)
     # For each row of the csv
@@ -283,7 +287,7 @@ def csv_file_validation(fileName):
 def write_csv(filename, lines_dict):
     """
     filename : name of the file to write
-    lines_dict : all the lines [{'Nom':'nom1', 'Prénom':'Prénom1', 'Adresse IP': '192.168.15.1', 'instanceId': 'instanceId1'},{'Nom':'nom2', 'Prénom':'Prénom2', 'Adresse IP': '192.168.15.1', 'instanceId': 'instanceId1'}]
+    lines_dict : all the lines [{'Nom':'nom1', 'Prénom':'Prénom1', 'Adresse IP': '192.168.15.1', 'instanceId': 'instanceId1', 'hostname'},{'Nom':'nom2', 'Prénom':'Prénom2', 'Adresse IP': '192.168.15.1', 'instanceId': 'instanceId1'}]
     """
     fieldnames = [
         "Nom",
@@ -293,6 +297,7 @@ def write_csv(filename, lines_dict):
         "image",
         "Adresse IP",
         "instanceId",
+        "hostname",
     ]
     with open(filename, "w", encoding="utf-8-sig", newline="") as monfile:
         myccsv = csv.DictWriter(monfile, delimiter=";", fieldnames=fieldnames)
@@ -340,7 +345,9 @@ def create_instances_from_csv(fileName, sshKeyId, monthlyBilling):
     - flavor
     - image
     """
+    # List of rows to write in the csv file
     write_rows = []
+
     # Declare a generator
     csv_file_validation(fileName)
     gen = read_csv(fileName)
@@ -372,6 +379,7 @@ def create_instances_from_csv(fileName, sshKeyId, monthlyBilling):
                 "image": row["image"],
                 "instanceId": instanceId,
                 "Adresse IP": "",
+                "hostname": "",
             }
         )
     write_csv(fileName, write_rows)
@@ -458,7 +466,7 @@ def getArgs(argv=None):
         "--monthlyBilling",
         dest="monthlyBilling",
         default=False,
-        choices=["true", "True"],
+        choices=["True", "False"],
         help="If we pay for a month",
     )
     parser.add_argument(
@@ -517,6 +525,7 @@ if __name__ == "__main__":
             settings[setting] = args[setting]
         elif os.environ.get(setting.upper()):
             settings[setting] = os.environ[setting]
+            logging.debug("setting {} set in environment variable".format(setting))
         else:
             print(
                 f"No value for {setting}. Enter one as argument or define one as environment variable : {setting.upper()}=."
